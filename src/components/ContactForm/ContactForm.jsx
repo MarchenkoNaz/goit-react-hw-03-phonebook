@@ -19,6 +19,7 @@ class ContactForm extends Component {
 			name: '',
 			number: ''
 		})
+
 	}
 
 	handleChange = (e) => {

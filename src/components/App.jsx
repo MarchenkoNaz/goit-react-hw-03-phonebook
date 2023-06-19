@@ -8,16 +8,26 @@ import ContactForm from './ContactForm/ContactForm';
 
 export class App extends Component {
 	state = {
-		contacts: [{ id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-		{ id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-		{ id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-		{ id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },],
+		contacts: [],
 		name: '',
 		filter: '',
 	}
 
+	componentDidMount() {
+		if (!!localStorage.getItem('contacts')) {
+			this.setState({ contacts: JSON.parse(localStorage.getItem('contacts')) });
+		}
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.contacts.length !== this.state.contacts.length) {
+			localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
+		}
+	}
+
+
 	addContact = (contact) => {
-		const newContact = { ...contact, id: nanoid() };
+		const newContact = { id: nanoid(), ...contact };
 		const isDublicated = this.state.contacts.some(
 			contact => contact.name === newContact.name
 		);
@@ -34,15 +44,13 @@ export class App extends Component {
 		this.setState(() => ({ filter: value }));
 	};
 
+
 	render() {
 		const { contacts, filter } = this.state;
-		const contactsFilteredByName = contacts.filter(contact =>
-			contact.name.toLowerCase().includes(filter.toLowerCase())
-		);
 		return (<>
 			<ContactForm addContact={this.addContact} />
 			<Filter filter={filter} onChange={this.onFilter} />
-			<ContactList contacts={contactsFilteredByName} deleteContact={this.deleteContact} />
+			<ContactList contacts={contacts} filter={filter} deleteContact={this.deleteContact} />
 			<ToastContainer />
 		</>
 		)
